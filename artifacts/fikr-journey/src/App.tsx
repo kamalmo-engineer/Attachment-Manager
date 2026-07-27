@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, BarChart3, Bike, Check, CheckCircle2, ChevronRight, CircleDollarSign, Clock3, Eye, GraduationCap, Heart, House, Landmark, Lightbulb, LockKeyhole, Map, RotateCcw, Ship, Sparkles, Store, Target, Trophy, X } from 'lucide-react';
+import { AlertTriangle, ArrowRight, BarChart3, Bike, Check, CheckCircle2, ChevronRight, CircleDollarSign, Clock3, Eye, GraduationCap, Heart, House, Landmark, Lightbulb, LockKeyhole, Map, RotateCcw, Ship, Sparkles, Store, Target, Trophy, X } from 'lucide-react';
 import younisFullBody from '@assets/ChatGPT_Image_Jul_27,_2026,_10_33_01_PM_1785182296436.png';
 
 type Scene = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+type Decision = 'Instant Gratification / Opportunity Loss' | null;
 
 const sceneMeta = [
   { id: 1, label: 'Welcome' },
@@ -410,7 +411,7 @@ function SceneThree({ coins, go, addCoins }: { coins: number; go: (scene: Scene)
   );
 }
 
-function SceneFour({ go }: { go: (scene: Scene) => void }) {
+function SceneFour({ onBuyToy, onSaveChoice }: { onBuyToy: () => void; onSaveChoice: () => void }) {
   return (
     <div className="scene-content scene-transition bg-[#101d2c]/65 backdrop-blur-[3px]">
       <div className="glass-card float-in w-[min(90%,600px)] rounded-3xl p-7 text-center md:p-10" data-testid="card-challenge">
@@ -419,11 +420,11 @@ function SceneFour({ go }: { go: (scene: Scene) => void }) {
         <h2 className="font-display text-[clamp(1.7rem,3.7vw,3rem)] font-bold leading-[1.06] tracking-[-.04em] text-[#fff7e9]" data-testid="heading-challenge">Younis wants a 40-coin toy today.</h2>
         <p className="mx-auto mt-4 max-w-[470px] text-sm leading-relaxed text-white/72" data-testid="text-challenge">His target is a 100-coin bicycle. Which choice helps future Younis get there?</p>
         <div className="mt-7 grid gap-3 md:grid-cols-2">
-          <button type="button" className="secondary-btn group flex min-h-[116px] flex-col items-start justify-between p-4 text-left" onClick={() => go(3)} data-testid="button-choice-buy-toy">
+          <button type="button" className="secondary-btn group flex min-h-[116px] flex-col items-start justify-between p-4 text-left" onClick={onBuyToy} data-testid="button-choice-buy-toy">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-[#f6b75c]"><Store size={17} /></span>
             <span><span className="block text-sm font-extrabold">Buy the toy</span><span className="mt-1 block text-xs text-white/55">Fun right now</span></span>
           </button>
-          <button type="button" className="primary-btn flex min-h-[116px] flex-col items-start justify-between p-4 text-left" onClick={() => go(5)} data-testid="button-choice-save-bonus">
+          <button type="button" className="primary-btn flex min-h-[116px] flex-col items-start justify-between p-4 text-left" onClick={onSaveChoice} data-testid="button-choice-save-bonus">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#172a3e]/15 text-[#172a3e]"><LockKeyhole size={17} /></span>
             <span><span className="block text-sm font-extrabold">Save & earn +10</span><span className="mt-1 block text-xs text-[#172a3e]/65">Build the bicycle fund</span></span>
           </button>
@@ -466,7 +467,9 @@ function SceneFive({ go, coins }: { go: (scene: Scene) => void; coins: number })
   );
 }
 
-function SceneSix({ go }: { go: (scene: Scene) => void }) {
+function SceneSix({ go, coins, decision }: { go: (scene: Scene) => void; coins: number; decision: Decision }) {
+  const impulseBuyDetected = decision === 'Instant Gratification / Opportunity Loss';
+
   return (
     <div className="scene-content scene-transition">
       <div className="dashboard-shell float-in text-white" data-testid="card-parent-dashboard">
@@ -474,14 +477,25 @@ function SceneSix({ go }: { go: (scene: Scene) => void }) {
           <div><div className="eyebrow mb-3">For the grown-ups</div><h2 className="font-display text-[clamp(2rem,4.3vw,4.25rem)] font-bold leading-none tracking-[-.06em]" data-testid="heading-parent-dashboard">A clearer view of<br /><span className="text-[#f6b75c]">growing confidence.</span></h2></div>
           <div className="flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-2 text-xs font-bold text-white/75"><div className="h-2 w-2 rounded-full bg-[#55c4b3]" /> Younis · age 9</div>
         </div>
+        {impulseBuyDetected && (
+          <div className="habit-alert mt-6" role="alert" data-testid="alert-impulse-buy">
+            <div className="flex items-start gap-3">
+              <div className="habit-alert-icon"><AlertTriangle size={19} /></div>
+              <div>
+                <div className="text-[10px] font-extrabold uppercase tracking-[.13em] text-[#ffcf82]">Financial Habit Alert</div>
+                <div className="mt-1 text-sm font-extrabold text-[#fff7e9]">Impulse Buy Detected (Bought 40-coin Toy)</div>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="mt-8 grid gap-3 md:grid-cols-3">
-          <div className="metric-card"><div className="mb-7 flex items-center justify-between text-[10px] font-bold uppercase tracking-[.13em] text-white/48"><span>Savings rate</span><CircleDollarSign size={16} className="text-[#55c4b3]" /></div><div className="font-mono text-4xl text-white" data-testid="metric-savings-rate">85%</div><div className="mt-2 text-xs text-[#55c4b3]">+12% this week</div></div>
+          <div className="metric-card"><div className="mb-7 flex items-center justify-between text-[10px] font-bold uppercase tracking-[.13em] text-white/48"><span>Savings rate</span><CircleDollarSign size={16} className={impulseBuyDetected ? 'text-[#ef786e]' : 'text-[#55c4b3]'} /></div><div className="font-mono text-4xl text-white" data-testid="metric-savings-rate">{impulseBuyDetected ? '45%' : '85%'}</div><div className={`mt-2 text-xs ${impulseBuyDetected ? 'text-[#ef786e]' : 'text-[#55c4b3]'}`}>{impulseBuyDetected ? '-40 coins spent today' : '+12% this week'}</div></div>
           <div className="metric-card"><div className="mb-7 flex items-center justify-between text-[10px] font-bold uppercase tracking-[.13em] text-white/48"><span>Decision speed</span><Clock3 size={16} className="text-[#f6b75c]" /></div><div className="font-mono text-4xl text-white" data-testid="metric-decision-speed">1.8<span className="text-base text-white/50"> sec</span></div><div className="mt-2 text-xs text-[#f6b75c]">Thoughtful, not rushed</div></div>
           <div className="metric-card"><div className="mb-7 flex items-center justify-between text-[10px] font-bold uppercase tracking-[.13em] text-white/48"><span>Streak</span><Trophy size={16} className="text-[#ef786e]" /></div><div className="font-mono text-4xl text-white" data-testid="metric-streak">6<span className="text-base text-white/50"> days</span></div><div className="mt-2 text-xs text-[#ef786e]">New personal best</div></div>
         </div>
         <div className="mt-4 grid gap-4 md:grid-cols-[1.15fr_.85fr]">
-          <div className="rounded-2xl border border-[#f6b75c]/25 bg-[#f6b75c]/10 p-5"><div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.13em] text-[#f6b75c]"><Sparkles size={14} /> AI parent insight</div><p className="max-w-[570px] text-sm leading-relaxed text-white/78" data-testid="text-parent-insight">Younis is pausing before purchases and connecting today’s choices to a future goal. Try asking, “What would your bicycle make possible?”</p></div>
-          <div className="flex items-center justify-between rounded-2xl border border-white/12 bg-white/5 p-5"><div><div className="text-[10px] font-bold uppercase tracking-[.13em] text-white/48">Next milestone</div><div className="mt-2 text-sm font-bold">Bicycle fund · 60 / 100</div></div><Bike size={32} className="text-[#55c4b3]" /></div>
+          <div className={`rounded-2xl p-5 ${impulseBuyDetected ? 'border border-[#ef786e]/35 bg-[#ef786e]/10' : 'border border-[#f6b75c]/25 bg-[#f6b75c]/10'}`}><div className={`mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.13em] ${impulseBuyDetected ? 'text-[#ff9b8f]' : 'text-[#f6b75c]'}`}><Sparkles size={14} /> {impulseBuyDetected ? 'Recommended parenting action' : 'AI parent insight'}</div><p className="max-w-[570px] text-sm leading-relaxed text-white/78" data-testid="text-parent-insight">{impulseBuyDetected ? "Discuss 'Wants vs. Needs' with Younis in his next goal review." : 'Younis is pausing before purchases and connecting today’s choices to a future goal. Try asking, “What would your bicycle make possible?”'}</p></div>
+          <div className={`flex items-center justify-between rounded-2xl p-5 ${impulseBuyDetected ? 'border border-[#ef786e]/35 bg-[#ef786e]/10' : 'border border-white/12 bg-white/5'}`} data-testid="card-goal-delay-forecast"><div><div className={`text-[10px] font-bold uppercase tracking-[.13em] ${impulseBuyDetected ? 'text-[#ff9b8f]' : 'text-white/48'}`}>Goal delay forecast</div><div className="mt-2 text-sm font-bold">{impulseBuyDetected ? '+7 Days delay to buy bicycle' : 'Bicycle fund · 60 / 100'}</div></div><Bike size={32} className={impulseBuyDetected ? 'text-[#ef786e]' : 'text-[#55c4b3]'} /></div>
         </div>
         <div className="mt-7 flex justify-end"><NextButton label="Continue to the big idea" onClick={() => go(7)} icon={<ArrowRight size={16} />} /></div>
       </div>
@@ -509,6 +523,7 @@ function SceneSeven({ reset }: { reset: () => void }) {
 function App() {
   const [scene, setScene] = useState<Scene>(1);
   const [coins, setCoins] = useState(50);
+  const [decision, setDecision] = useState<Decision>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const wheelDistance = useRef(0);
   const wheelResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -520,7 +535,17 @@ function App() {
   const addCoins = (amount: number) => setCoins((current) => current + amount);
   const reset = () => {
     setCoins(50);
+    setDecision(null);
     setScene(1);
+  };
+  const buyToy = () => {
+    setCoins((current) => Math.max(0, current - 40));
+    setDecision('Instant Gratification / Opportunity Loss');
+    setScene(6);
+  };
+  const saveChoice = () => {
+    setDecision(null);
+    go(5);
   };
   const stepScene = (direction: 1 | -1) => {
     setScene((current) => Math.min(7, Math.max(1, current + direction)) as Scene);
@@ -569,6 +594,7 @@ function App() {
       if (event.key === 'ArrowLeft') setScene((current) => Math.max(1, current - 1) as Scene);
       if (event.key === 'Escape') {
         setCoins(50);
+        setDecision(null);
         setScene(1);
       }
     };
@@ -588,9 +614,9 @@ function App() {
         {scene === 1 && <SceneOne go={go} />}
         {scene === 2 && <SceneTwo go={go} />}
          {scene === 3 && <SceneThree coins={coins} go={go} addCoins={addCoins} />}
-        {scene === 4 && <SceneFour go={go} />}
+        {scene === 4 && <SceneFour onBuyToy={buyToy} onSaveChoice={saveChoice} />}
          {scene === 5 && <SceneFive coins={coins} go={go} />}
-        {scene === 6 && <SceneSix go={go} />}
+        {scene === 6 && <SceneSix coins={coins} decision={decision} go={go} />}
         {scene === 7 && <SceneSeven reset={reset} />}
         <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5" aria-label="Scene progress">
           {sceneMeta.map((item) => <span key={item.id} className={`h-1 rounded-full transition-all ${scene === item.id ? 'w-7 bg-[#f6b75c]' : 'w-1.5 bg-white/45'}`} data-testid={`progress-scene-${item.id}`} />)}
