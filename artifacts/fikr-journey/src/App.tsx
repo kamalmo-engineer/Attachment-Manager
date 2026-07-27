@@ -40,25 +40,45 @@ function CoinPill({ value }: { value: number }) {
   );
 }
 
-function JumpBar({ scene, onJump }: { scene: Scene; onJump: (id: Scene) => void }) {
+function AppHeader({
+  scene,
+  coins,
+  parentOpen,
+  onParentView,
+}: {
+  scene: Scene;
+  coins: number;
+  parentOpen: boolean;
+  onParentView: () => void;
+}) {
+  const isInsideWorld = scene >= 3 && scene <= 5;
+
   return (
-    <div className="topbar">
+    <header className="app-header" data-testid="app-header">
       <Logo />
-      <nav className="jumpbar" aria-label="Presentation scenes" data-testid="nav-scene-jumpbar">
-        {sceneMeta.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={`jump-button ${scene === item.id ? 'active' : ''}`}
-            onClick={() => onJump(item.id as Scene)}
-            data-testid={`button-jump-scene-${item.id}`}
-          >
-            <span>0{item.id}</span>
-            <span>{item.label}</span>
-          </button>
-        ))}
-      </nav>
-    </div>
+      {isInsideWorld && (
+        <div className="player-stats" aria-label="Player stats" data-testid="player-stats-bar">
+          <CoinPill value={coins} />
+          <span className="xp-stat" data-testid="text-xp-level">
+            <span className="xp-label">⚡ XP</span>
+            <span className="xp-track" aria-hidden="true"><span className="xp-fill" /></span>
+            <span className="xp-value">Level 2</span>
+          </span>
+          <span className="saver-badge" data-testid="badge-smart-saver">🏅 Smart saver</span>
+        </div>
+      )}
+      <button
+        type="button"
+        className={`parent-toggle ${parentOpen ? 'active' : ''}`}
+        onClick={onParentView}
+        aria-pressed={parentOpen}
+        data-testid="button-parent-view-toggle"
+      >
+        <span className="parent-toggle-mark">👨‍👩‍👧</span>
+        <span>{parentOpen ? 'Close parent view' : 'Parent view'}</span>
+        <Eye size={15} />
+      </button>
+    </header>
   );
 }
 
@@ -110,7 +130,7 @@ function SceneTwo({ go }: { go: (scene: Scene) => void }) {
           <div className="mb-2 flex items-center justify-between text-[11px] text-white/60"><span>Goal progress</span><span className="font-mono text-[#f6b75c]">0 / 100</span></div>
           <div className="progress-track"><div className="progress-fill" style={{ width: '0%' }} /></div>
         </div>
-        <div className="mt-7 flex justify-end"><NextButton label="Show me around" onClick={() => go(3)} /></div>
+         <div className="mt-7 flex justify-end"><NextButton label="Enter world" onClick={() => go(3)} /></div>
       </div>
     </div>
   );
@@ -126,7 +146,7 @@ function HubStats({ coins }: { coins: number }) {
   );
 }
 
-function SceneThree({ coins, go }: { coins: number; go: (scene: Scene) => void }) {
+function SceneThree({ coins, go, openParentView }: { coins: number; go: (scene: Scene) => void; openParentView: () => void }) {
   return (
     <div className="scene-content scene-transition">
       <HubStats coins={coins} />
@@ -144,7 +164,7 @@ function SceneThree({ coins, go }: { coins: number; go: (scene: Scene) => void }
         <Target size={24} className="mx-auto" />
         <span className="hotspot-label">Start mission</span>
       </button>
-      <button type="button" className="glass-card absolute right-6 top-[19%] z-10 flex items-center gap-3 rounded-2xl px-4 py-3 text-left text-white" onClick={() => go(6)} data-testid="button-parent-insight">
+       <button type="button" className="glass-card absolute right-6 top-[19%] z-10 flex items-center gap-3 rounded-2xl px-4 py-3 text-left text-white" onClick={openParentView} data-testid="button-parent-insight">
         <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ef786e]"><Eye size={17} /></span>
         <span><span className="block text-[10px] font-bold uppercase tracking-[.1em] text-white/55">Parent view</span><span className="block text-xs font-bold">See the progress</span></span>
       </button>
@@ -189,7 +209,7 @@ function Confetti() {
   return <>{pieces.map((piece) => <span key={piece.id} className="confetti" style={{ left: piece.left, top: piece.top, background: piece.color, animationDelay: piece.delay, ['--drift' as string]: piece.drift }} />)}</>;
 }
 
-function SceneFive({ go, coins }: { go: (scene: Scene) => void; coins: number }) {
+function SceneFive({ go, coins, openParentView }: { go: (scene: Scene) => void; coins: number; openParentView: () => void }) {
   return (
     <div className="scene-content scene-transition">
       <Confetti />
@@ -203,7 +223,7 @@ function SceneFive({ go, coins }: { go: (scene: Scene) => void; coins: number })
           <div className="text-2xl text-white/35">+</div>
           <div className="rounded-2xl border border-[#55c4b3]/35 bg-[#55c4b3]/15 px-5 py-3"><div className="font-mono text-3xl font-medium text-[#55c4b3]">+10</div><div className="mt-1 text-[10px] uppercase tracking-[.16em] text-white/55">bonus coins</div></div>
         </div>
-        <NextButton label="See the parent view" onClick={() => go(6)} icon={<BarChart3 size={16} />} />
+         <NextButton label="See the parent view" onClick={openParentView} icon={<BarChart3 size={16} />} />
       </div>
     </div>
   );
@@ -252,20 +272,29 @@ function SceneSeven({ reset }: { reset: () => void }) {
 function App() {
   const [scene, setScene] = useState<Scene>(1);
   const [coins, setCoins] = useState(50);
+  const [parentReturnScene, setParentReturnScene] = useState<Scene>(3);
 
   const go = (next: Scene) => {
     if (next === 5) setCoins(60);
     setScene(next);
   };
+  const openParentView = () => {
+    if (scene === 6) {
+      setScene(parentReturnScene);
+      return;
+    }
+
+    setParentReturnScene(scene);
+    setScene(6);
+  };
   const reset = () => {
     setCoins(50);
+    setParentReturnScene(3);
     setScene(1);
   };
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowRight') setScene((current) => Math.min(7, current + 1) as Scene);
-      if (event.key === 'ArrowLeft') setScene((current) => Math.max(1, current - 1) as Scene);
       if (event.key === 'Escape') reset();
     };
     window.addEventListener('keydown', onKey);
@@ -277,12 +306,12 @@ function App() {
       <div className="cinema-frame" data-testid="fikr-cinema-frame">
         <img className="scene-image" src={backgrounds[scene]} alt="" data-testid={`img-scene-background-${scene}`} />
         <div className="scene-vignette" />
-        <JumpBar scene={scene} onJump={go} />
+         <AppHeader scene={scene} coins={coins} parentOpen={scene === 6} onParentView={openParentView} />
         {scene === 1 && <SceneOne go={go} />}
         {scene === 2 && <SceneTwo go={go} />}
-        {scene === 3 && <SceneThree coins={coins} go={go} />}
+         {scene === 3 && <SceneThree coins={coins} go={go} openParentView={openParentView} />}
         {scene === 4 && <SceneFour go={go} />}
-        {scene === 5 && <SceneFive coins={coins} go={go} />}
+         {scene === 5 && <SceneFive coins={coins} go={go} openParentView={openParentView} />}
         {scene === 6 && <SceneSix go={go} />}
         {scene === 7 && <SceneSeven reset={reset} />}
         <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5" aria-label="Scene progress">
