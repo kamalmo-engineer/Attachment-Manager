@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { motion } from 'framer-motion';
 import { ArrowRight, BarChart3, Bike, Check, ChevronRight, CircleDollarSign, Clock3, Eye, Heart, House, Lightbulb, LockKeyhole, Map, RotateCcw, Sparkles, Store, Target, Trophy } from 'lucide-react';
 
 type Scene = 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -74,9 +75,13 @@ function SceneOne({ go }: { go: (scene: Scene) => void }) {
   return (
     <div className="scene-content scene-transition">
       <div className="float-in w-[min(82%,540px)] text-center">
-        <div className="mx-auto mb-7 flex h-20 w-20 items-center justify-center rounded-[26px] border border-white/25 bg-[#f6b75c] text-4xl font-bold text-[#172a3e] shadow-[0_12px_35px_rgba(0,0,0,.25)]" data-testid="icon-fikr-mark">F</div>
+        <img
+          src="/fikr-emblem.png"
+          alt="FIKR emblem"
+          className="mx-auto mb-7 h-28 w-28 rounded-full object-cover shadow-[0_14px_38px_rgba(0,0,0,.32)]"
+          data-testid="img-fikr-emblem"
+        />
         <div className="eyebrow mb-4" data-testid="text-scene-eyebrow">A little island. A big future.</div>
-        <h1 className="display-title text-[clamp(3rem,8vw,7rem)]" data-testid="heading-fikr">FIKR</h1>
         <p className="mx-auto mt-5 max-w-[420px] text-[clamp(1rem,2vw,1.25rem)] leading-relaxed text-white/85" data-testid="text-tagline">Smart money habits for kids — built one brave choice at a time.</p>
         <div className="mt-9 flex flex-col items-center gap-4">
           <NextButton label="Start journey" onClick={() => go(2)} icon={<ChevronRight size={18} />} />
@@ -92,14 +97,38 @@ function SceneOne({ go }: { go: (scene: Scene) => void }) {
 
 function SceneTwo({ go }: { go: (scene: Scene) => void }) {
   return (
-    <div className="scene-content scene-transition justify-start px-[8%]">
-      <div className="glass-card float-in max-w-[465px] rounded-3xl p-7 md:p-9" data-testid="card-younis-intro">
+    <div className="scene-content scene-two-layout scene-transition px-[6%]">
+      <div className="younis-stage" data-testid="stage-younis">
+        <motion.div
+          className="younis-character"
+          animate={{
+            y: [0, -10, 0],
+            rotateZ: [0, -0.7, 0.7, 0],
+            rotateY: [0, 1.5, -1.5, 0],
+          }}
+          transition={{ duration: 4.8, ease: 'easeInOut', repeat: Infinity }}
+          style={{ transformPerspective: 900 }}
+        >
+          <img
+            src="/younis-full-body.jpeg"
+            alt="Younis standing and smiling"
+            className="younis-image"
+            data-testid="img-younis-full-body"
+          />
+        </motion.div>
+        <motion.div
+          className="younis-shadow"
+          animate={{ scaleX: [1, 0.88, 1], opacity: [0.42, 0.28, 0.42] }}
+          transition={{ duration: 4.8, ease: 'easeInOut', repeat: Infinity }}
+          aria-hidden="true"
+        />
+      </div>
+      <div className="glass-card float-in scene-two-card max-w-[465px] rounded-3xl p-7 md:p-9" data-testid="card-younis-intro">
         <div className="mb-6 flex items-center justify-between">
           <div className="eyebrow">Chapter 01 / A reason to save</div>
           <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 font-mono text-[10px] text-white/65">DAY 01</span>
         </div>
         <div className="mb-5 flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#ef786e] text-2xl font-bold text-[#fff7e9]" data-testid="avatar-younis">Y</div>
           <div>
             <h2 className="font-display text-3xl font-bold tracking-tight text-[#fff7e9]" data-testid="heading-younis">Meet Younis.</h2>
             <p className="text-sm text-white/60" data-testid="text-younis-age">9 years old · curious by nature</p>
