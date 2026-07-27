@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, BarChart3, Bike, Check, CheckCircle2, ChevronRight, CircleDollarSign, Clock3, Eye, GraduationCap, Heart, House, Landmark, Lightbulb, LockKeyhole, Map, RotateCcw, Ship, Sparkles, Store, Target, Trophy, X } from 'lucide-react';
 import younisFullBody from '@assets/ChatGPT_Image_Jul_27,_2026,_10_33_01_PM_1785182296436.png';
@@ -169,6 +169,7 @@ function HubModal({
   onCompleteMission,
   onWishlist,
   onNotify,
+  onProceedToChoice,
   deposited,
   missionComplete,
   wishlisted,
@@ -181,6 +182,7 @@ function HubModal({
   onCompleteMission: () => void;
   onWishlist: () => void;
   onNotify: () => void;
+  onProceedToChoice: () => void;
   deposited: boolean;
   missionComplete: boolean;
   wishlisted: boolean;
@@ -281,6 +283,11 @@ function HubModal({
             <button type="button" className="primary-btn mt-5 inline-flex w-full items-center justify-center gap-2 px-4 py-3 text-xs" onClick={onCompleteMission} disabled={missionComplete} data-testid="button-complete-financial-quiz">
               {missionComplete ? <><CheckCircle2 size={15} /> Quiz complete · +20 coins</> : <>Complete quiz to earn 20 coins <ArrowRight size={15} /></>}
             </button>
+            {missionComplete && (
+              <button type="button" className="secondary-btn mt-3 inline-flex w-full items-center justify-center gap-2 px-4 py-3 text-xs" onClick={onProceedToChoice} data-testid="button-proceed-to-choice-from-academy">
+                Proceed to Next Chapter ➔
+              </button>
+            )}
           </div>
         )}
 
@@ -301,6 +308,11 @@ function HubModal({
             <button type="button" className="secondary-btn mt-5 inline-flex w-full items-center justify-center gap-2 px-4 py-3 text-xs" onClick={onWishlist} data-testid="button-add-bicycle-wishlist">
               {wishlisted ? <><Check size={15} /> Added to wishlist</> : <><Bike size={15} /> Add bicycle to wishlist</>}
             </button>
+            {wishlisted && (
+              <button type="button" className="primary-btn mt-3 inline-flex w-full items-center justify-center gap-2 px-4 py-3 text-xs" onClick={onProceedToChoice} data-testid="button-proceed-to-choice-from-wishlist">
+                Proceed to Next Chapter ➔
+              </button>
+            )}
           </div>
         )}
 
@@ -340,12 +352,17 @@ function SceneThree({ coins, go, addCoins }: { coins: number; go: (scene: Scene)
   return (
     <div className="scene-content scene-transition">
       <HubStats coins={coins} />
-      <div className="absolute bottom-[9%] left-[7%] z-10 max-w-[290px]">
-        <button type="button" className="glass-card hub-mission-card rounded-2xl p-4 text-left" onClick={() => openModal('academy')} data-testid="button-open-current-mission">
-          <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.14em] text-[#f6b75c]"><Sparkles size={13} /> Current mission</div>
-          <p className="text-sm leading-relaxed text-white/85">A choice is waiting in the plaza. Small decisions can move big dreams.</p>
-          <span className="mt-3 inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-[.12em] text-[#f6b75c]">Open academy <ArrowRight size={12} /></span>
-        </button>
+      <div className="glass-card absolute bottom-[9%] left-[7%] z-10 max-w-[290px] rounded-2xl p-4 text-left" data-testid="card-current-mission">
+        <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.14em] text-[#f6b75c]"><Sparkles size={13} /> Current mission</div>
+        <p className="text-sm leading-relaxed text-white/85">A choice is waiting in the plaza. Small decisions can move big dreams.</p>
+        <div className="mt-3 flex flex-col items-start gap-3">
+          <button type="button" className="mission-link" onClick={() => openModal('academy')} data-testid="button-open-current-mission">
+            Open academy <ArrowRight size={12} />
+          </button>
+          <button type="button" className="primary-btn inline-flex w-full items-center justify-center gap-2 px-3 py-2.5 text-[11px]" onClick={() => go(4)} data-testid="button-go-to-plaza">
+            Go to Plaza (Make Choice) ➔
+          </button>
+        </div>
       </div>
       <button type="button" className="hotspot hub-hotspot left-[28%] top-[48%] h-12 w-12 rounded-2xl" onClick={() => openModal('market')} data-testid="button-hotspot-marketplace" aria-label="Open store and marketplace">
         <Store size={20} className="mx-auto" />
@@ -378,6 +395,10 @@ function SceneThree({ coins, go, addCoins }: { coins: number; go: (scene: Scene)
             onCompleteMission={completeMission}
             onWishlist={() => setWishlisted((current) => !current)}
             onNotify={() => setNotified((current) => !current)}
+            onProceedToChoice={() => {
+              setModal(null);
+              go(4);
+            }}
             deposited={deposited}
             missionComplete={missionComplete}
             wishlisted={wishlisted}
@@ -488,6 +509,9 @@ function SceneSeven({ reset }: { reset: () => void }) {
 function App() {
   const [scene, setScene] = useState<Scene>(1);
   const [coins, setCoins] = useState(50);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const wheelDistance = useRef(0);
+  const wheelResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const go = (next: Scene) => {
     if (next === 5) setCoins(60);
@@ -498,19 +522,65 @@ function App() {
     setCoins(50);
     setScene(1);
   };
+  const stepScene = (direction: 1 | -1) => {
+    setScene((current) => Math.min(7, Math.max(1, current + direction)) as Scene);
+  };
+  const isModalInteraction = (target: EventTarget | null) =>
+    target instanceof Element && Boolean(target.closest('.hub-modal-backdrop'));
+  const onWheel = (event: React.WheelEvent<HTMLElement>) => {
+    if (isModalInteraction(event.target)) return;
+    const distance = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+    if (distance === 0) return;
+    wheelDistance.current += distance;
+    if (Math.abs(wheelDistance.current) >= 90) {
+      stepScene(wheelDistance.current > 0 ? 1 : -1);
+      wheelDistance.current = 0;
+    }
+    if (wheelResetTimer.current) clearTimeout(wheelResetTimer.current);
+    wheelResetTimer.current = setTimeout(() => {
+      wheelDistance.current = 0;
+    }, 180);
+  };
+  const onTouchStart = (event: React.TouchEvent<HTMLElement>) => {
+    if (isModalInteraction(event.target)) {
+      touchStart.current = null;
+      return;
+    }
+    const touch = event.touches[0];
+    touchStart.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
+  };
+  const onTouchEnd = (event: React.TouchEvent<HTMLElement>) => {
+    if (isModalInteraction(event.target) || !touchStart.current) {
+      touchStart.current = null;
+      return;
+    }
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    const deltaX = touch.clientX - touchStart.current.x;
+    const deltaY = touch.clientY - touchStart.current.y;
+    touchStart.current = null;
+    const distance = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
+    if (Math.abs(distance) >= 55) stepScene(distance < 0 ? 1 : -1);
+  };
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight') setScene((current) => Math.min(7, current + 1) as Scene);
       if (event.key === 'ArrowLeft') setScene((current) => Math.max(1, current - 1) as Scene);
-      if (event.key === 'Escape') reset();
+      if (event.key === 'Escape') {
+        setCoins(50);
+        setScene(1);
+      }
     };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      if (wheelResetTimer.current) clearTimeout(wheelResetTimer.current);
+    };
   }, []);
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" onWheel={onWheel} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       <div className="cinema-frame" data-testid="fikr-cinema-frame">
         <img className="scene-image" src={backgrounds[scene]} alt="" data-testid={`img-scene-background-${scene}`} />
         <div className="scene-vignette" />

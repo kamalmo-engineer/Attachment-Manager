@@ -373,6 +373,21 @@
   background: rgba(255,255,255,.1);
 }
 .secondary-btn:hover { background: rgba(255,255,255,.17); transform: translateY(-2px); }
+.mission-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  padding: 0;
+  color: #f6b75c;
+  background: transparent;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.mission-link:hover { color: #fff7e9; }
 
 .hotspot {
   position: absolute;
