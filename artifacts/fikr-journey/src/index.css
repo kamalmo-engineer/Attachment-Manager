@@ -393,6 +393,14 @@
   animation: pulse-ring 2.2s ease-out infinite;
 }
 .hotspot:hover { transform: scale(1.08); box-shadow: 0 0 0 9px rgba(246,183,92,.25), 0 12px 28px rgba(0,0,0,.3); }
+.hub-hotspot {
+  outline: 1px solid rgba(255,255,255,.35);
+  outline-offset: 4px;
+  animation: hotspot-breathe 2.8s ease-in-out infinite;
+}
+.hub-hotspot:nth-of-type(2) { animation-delay: -.7s; }
+.hub-hotspot:nth-of-type(3) { animation-delay: -1.4s; }
+.hub-hotspot:nth-of-type(4) { animation-delay: -2.1s; }
 .hotspot-label {
   position: absolute;
   top: calc(100% + 13px);
@@ -407,6 +415,108 @@
   padding: 7px 10px;
   border-radius: 8px;
   backdrop-filter: blur(10px);
+}
+.hub-mission-card {
+  border: 1px solid rgba(246,183,92,.34);
+  cursor: pointer;
+  transition: transform .2s ease, border-color .2s ease, background .2s ease;
+}
+.hub-mission-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(246,183,92,.72);
+  background: rgba(18,36,53,.78);
+}
+
+.hub-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(5, 14, 26, .52);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+.hub-modal {
+  width: min(100%, 475px);
+  max-height: min(86%, 600px);
+  overflow-y: auto;
+  padding: 26px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(24,47,66,.96), rgba(10,25,41,.96));
+  box-shadow: 0 30px 80px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.1);
+}
+.hub-modal-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  color: #172a3e;
+  background: #f6b75c;
+  box-shadow: 0 8px 22px rgba(246,183,92,.22);
+}
+.modal-close {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 999px;
+  color: rgba(255,255,255,.72);
+  background: rgba(255,255,255,.07);
+  cursor: pointer;
+  transition: transform .2s ease, background .2s ease, color .2s ease;
+}
+.modal-close:hover {
+  transform: rotate(8deg) scale(1.06);
+  color: #fff7e9;
+  background: rgba(255,255,255,.15);
+}
+.hub-account-card,
+.hub-feature-card {
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  background: rgba(255,255,255,.06);
+  padding: 16px;
+}
+.hub-account-card {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.hub-modal-label {
+  display: block;
+  color: rgba(255,255,255,.52);
+  font-family: var(--app-font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+.hub-account-value {
+  display: block;
+  margin-top: 5px;
+  color: #f6b75c;
+  font-family: var(--app-font-mono);
+  font-size: 24px;
+  font-weight: 500;
+}
+.hub-feature-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border-radius: 11px;
+}
+button:disabled {
+  cursor: default;
+  opacity: .82;
 }
 
 .coin-pill {
@@ -477,6 +587,7 @@
 }
 
 @keyframes pulse-ring { 0% { transform: scale(.8); opacity: .85; } 70%, 100% { transform: scale(1.45); opacity: 0; } }
+@keyframes hotspot-breathe { 0%, 100% { box-shadow: 0 0 0 7px rgba(246,183,92,.2), 0 10px 24px rgba(0,0,0,.26); } 50% { box-shadow: 0 0 0 11px rgba(246,183,92,.08), 0 14px 30px rgba(0,0,0,.32); } }
 @keyframes scene-in { from { opacity: 0; transform: scale(1.025); } to { opacity: 1; transform: scale(1); } }
 @keyframes float-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes confetti-fall { 0% { opacity: 0; transform: translate3d(0,-30px,0) rotate(0); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate3d(var(--drift), 420px, 0) rotate(530deg); } }
@@ -504,4 +615,7 @@
   .scene-two-layout > .scene-two-card { grid-column: auto; }
   .younis-stage { width: min(72%, 300px); height: min(48dvh, 360px); min-height: 250px; }
   .scene-two-card { flex-basis: auto; width: min(92%, 465px); }
+  .hub-modal-backdrop { padding: 16px; }
+  .hub-modal { padding: 21px; border-radius: 20px; }
+  .hub-account-value { font-size: 20px; }
 }

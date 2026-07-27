@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight, BarChart3, Bike, Check, ChevronRight, CircleDollarSign, Clock3, Eye, Heart, House, Lightbulb, LockKeyhole, Map, RotateCcw, Sparkles, Store, Target, Trophy } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowRight, BarChart3, Bike, Check, CheckCircle2, ChevronRight, CircleDollarSign, Clock3, Eye, GraduationCap, Heart, House, Landmark, Lightbulb, LockKeyhole, Map, RotateCcw, Ship, Sparkles, Store, Target, Trophy, X } from 'lucide-react';
 import younisFullBody from '@assets/ChatGPT_Image_Jul_27,_2026,_10_33_01_PM_1785182296436.png';
 
 type Scene = 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -159,29 +159,232 @@ function HubStats({ coins }: { coins: number }) {
   );
 }
 
-function SceneThree({ coins, go }: { coins: number; go: (scene: Scene) => void }) {
+type HubModalId = 'bank' | 'academy' | 'market' | 'port';
+
+function HubModal({
+  modal,
+  coins,
+  onClose,
+  onDeposit,
+  onCompleteMission,
+  onWishlist,
+  onNotify,
+  deposited,
+  missionComplete,
+  wishlisted,
+  notified,
+}: {
+  modal: HubModalId;
+  coins: number;
+  onClose: () => void;
+  onDeposit: () => void;
+  onCompleteMission: () => void;
+  onWishlist: () => void;
+  onNotify: () => void;
+  deposited: boolean;
+  missionComplete: boolean;
+  wishlisted: boolean;
+  notified: boolean;
+}) {
+  const content = {
+    bank: {
+      icon: <Landmark size={21} />,
+      eyebrow: 'Bank / Treasury',
+      title: "Younis's Savings Account",
+      description: 'A safe place for every coin that gets Younis closer to his bicycle.',
+    },
+    academy: {
+      icon: <GraduationCap size={21} />,
+      eyebrow: 'Lighthouse / Academy',
+      title: 'Financial Missions & Lessons',
+      description: 'Learn one smart money idea, then put it into practice around the island.',
+    },
+    market: {
+      icon: <Store size={21} />,
+      eyebrow: 'Store / Marketplace',
+      title: 'Wishlist & Rewards Store',
+      description: 'Choose a goal, track your progress, and make thoughtful purchases when you are ready.',
+    },
+    port: {
+      icon: <Ship size={21} />,
+      eyebrow: 'Port / Boats',
+      title: 'Investment & Trade',
+      description: 'The port is getting ready for bigger money decisions in the next level.',
+    },
+  }[modal];
+
+  return (
+    <motion.div
+      className="hub-modal-backdrop"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      data-testid="hub-modal-backdrop"
+    >
+      <motion.div
+        className="hub-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="hub-modal-title"
+        initial={{ opacity: 0, y: 18, scale: .96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 12, scale: .97 }}
+        transition={{ type: 'spring', stiffness: 360, damping: 28 }}
+        onClick={(event) => event.stopPropagation()}
+        data-testid={`modal-hub-${modal}`}
+      >
+        <div className="flex items-start justify-between gap-5">
+          <div className="flex items-start gap-3">
+            <div className="hub-modal-icon">{content.icon}</div>
+            <div>
+              <div className="eyebrow">{content.eyebrow}</div>
+              <h2 id="hub-modal-title" className="mt-2 font-display text-2xl font-bold tracking-tight text-[#fff7e9]">{content.title}</h2>
+            </div>
+          </div>
+          <button type="button" className="modal-close" onClick={onClose} aria-label="Close popup" data-testid="button-close-hub-modal">
+            <X size={18} />
+          </button>
+        </div>
+        <p className="mt-5 text-sm leading-relaxed text-white/70">{content.description}</p>
+
+        {modal === 'bank' && (
+          <>
+            <div className="hub-account-card mt-6">
+              <div>
+                <span className="hub-modal-label">Balance</span>
+                <strong className="hub-account-value">{coins} coins</strong>
+              </div>
+              <div className="text-right">
+                <span className="hub-modal-label">Daily interest</span>
+                <strong className="text-lg text-[#55c4b3]">+1 coin</strong>
+              </div>
+            </div>
+            <div className="mt-5 flex items-center justify-between gap-3">
+              <span className="text-xs text-white/55">{deposited ? 'Deposit recorded. Keep building your habit.' : 'Add a little to your future today.'}</span>
+              <button type="button" className="primary-btn inline-flex shrink-0 items-center gap-2 px-4 py-2.5 text-xs" onClick={onDeposit} data-testid="button-bank-deposit">
+                <CircleDollarSign size={15} /> {deposited ? 'Deposit +10' : 'Deposit'}
+              </button>
+            </div>
+          </>
+        )}
+
+        {modal === 'academy' && (
+          <div className="hub-feature-card mt-6">
+            <div className="flex items-start gap-3">
+              <div className="hub-feature-icon bg-[#f6b75c]/15 text-[#f6b75c]"><Lightbulb size={18} /></div>
+              <div>
+                <div className="text-sm font-extrabold text-white">Needs vs. wants</div>
+                <p className="mt-1 text-xs leading-relaxed text-white/60">Complete a quick quiz to practice pausing before a purchase.</p>
+              </div>
+            </div>
+            <button type="button" className="primary-btn mt-5 inline-flex w-full items-center justify-center gap-2 px-4 py-3 text-xs" onClick={onCompleteMission} disabled={missionComplete} data-testid="button-complete-financial-quiz">
+              {missionComplete ? <><CheckCircle2 size={15} /> Quiz complete · +20 coins</> : <>Complete quiz to earn 20 coins <ArrowRight size={15} /></>}
+            </button>
+          </div>
+        )}
+
+        {modal === 'market' && (
+          <div className="hub-feature-card mt-6">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="hub-feature-icon bg-[#55c4b3]/15 text-[#55c4b3]"><Bike size={18} /></div>
+                <div>
+                  <div className="text-sm font-extrabold text-white">Bicycle</div>
+                  <div className="mt-1 text-xs text-white/55">Your big dream</div>
+                </div>
+              </div>
+              <strong className="font-mono text-sm text-[#f6b75c]">100 coins</strong>
+            </div>
+            <div className="mt-5 flex items-center justify-between text-[11px] text-white/60"><span>Progress</span><span className="font-mono text-[#f6b75c]">0 / 100</span></div>
+            <div className="progress-track mt-2"><div className="progress-fill" style={{ width: '0%' }} /></div>
+            <button type="button" className="secondary-btn mt-5 inline-flex w-full items-center justify-center gap-2 px-4 py-3 text-xs" onClick={onWishlist} data-testid="button-add-bicycle-wishlist">
+              {wishlisted ? <><Check size={15} /> Added to wishlist</> : <><Bike size={15} /> Add bicycle to wishlist</>}
+            </button>
+          </div>
+        )}
+
+        {modal === 'port' && (
+          <div className="hub-feature-card mt-6 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#55c4b3]/15 text-[#55c4b3]"><Ship size={22} /></div>
+            <div className="mt-4 text-sm font-extrabold text-white">Coming Soon in Level 2</div>
+            <p className="mt-2 text-xs leading-relaxed text-white/60">Soon Younis will learn how investments and trade can help money grow over time.</p>
+            <button type="button" className="secondary-btn mt-5 inline-flex items-center justify-center gap-2 px-4 py-3 text-xs" onClick={onNotify} data-testid="button-notify-port">
+              {notified ? <><Check size={15} /> You’re on the list</> : <>Notify me for Level 2 <ArrowRight size={15} /></>}
+            </button>
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function SceneThree({ coins, go, addCoins }: { coins: number; go: (scene: Scene) => void; addCoins: (amount: number) => void }) {
+  const [modal, setModal] = useState<HubModalId | null>(null);
+  const [deposited, setDeposited] = useState(false);
+  const [missionComplete, setMissionComplete] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [notified, setNotified] = useState(false);
+
+  const openModal = (nextModal: HubModalId) => setModal(nextModal);
+  const deposit = () => {
+    addCoins(10);
+    setDeposited(true);
+  };
+  const completeMission = () => {
+    if (missionComplete) return;
+    addCoins(20);
+    setMissionComplete(true);
+  };
+
   return (
     <div className="scene-content scene-transition">
       <HubStats coins={coins} />
       <div className="absolute bottom-[9%] left-[7%] z-10 max-w-[290px]">
-        <div className="glass-card rounded-2xl p-4" data-testid="card-hub-mission">
+        <button type="button" className="glass-card hub-mission-card rounded-2xl p-4 text-left" onClick={() => openModal('academy')} data-testid="button-open-current-mission">
           <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.14em] text-[#f6b75c]"><Sparkles size={13} /> Current mission</div>
           <p className="text-sm leading-relaxed text-white/85">A choice is waiting in the plaza. Small decisions can move big dreams.</p>
-        </div>
+          <span className="mt-3 inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-[.12em] text-[#f6b75c]">Open academy <ArrowRight size={12} /></span>
+        </button>
       </div>
-      <button type="button" className="hotspot left-[28%] top-[48%] h-12 w-12 rounded-2xl" onClick={() => go(2)} data-testid="button-hotspot-bakery" aria-label="Open bakery">
+      <button type="button" className="hotspot hub-hotspot left-[28%] top-[48%] h-12 w-12 rounded-2xl" onClick={() => openModal('market')} data-testid="button-hotspot-marketplace" aria-label="Open store and marketplace">
         <Store size={20} className="mx-auto" />
-        <span className="hotspot-label">Bakery stop</span>
+        <span className="hotspot-label">Wishlist & rewards</span>
       </button>
-      <button type="button" className="hotspot left-[53%] top-[46%] h-14 w-14 rounded-full" onClick={() => go(4)} data-testid="button-hotspot-mission" aria-label="Start active mission">
-        <Target size={24} className="mx-auto" />
-        <span className="hotspot-label">Start mission</span>
+      <button type="button" className="hotspot hub-hotspot left-[48%] top-[35%] h-14 w-14 rounded-full" onClick={() => openModal('bank')} data-testid="button-hotspot-bank" aria-label="Open bank and treasury">
+        <Landmark size={24} className="mx-auto" />
+        <span className="hotspot-label">Bank / treasury</span>
       </button>
-       <button type="button" className="glass-card absolute right-6 top-[19%] z-10 flex items-center gap-3 rounded-2xl px-4 py-3 text-left text-white" onClick={() => go(6)} data-testid="button-parent-insight">
+      <button type="button" className="hotspot hub-hotspot left-[68%] top-[39%] h-14 w-14 rounded-full" onClick={() => openModal('academy')} data-testid="button-hotspot-academy" aria-label="Open lighthouse academy">
+        <GraduationCap size={23} className="mx-auto" />
+        <span className="hotspot-label">Financial academy</span>
+      </button>
+      <button type="button" className="hotspot hub-hotspot left-[79%] top-[58%] h-12 w-12 rounded-2xl" onClick={() => openModal('port')} data-testid="button-hotspot-port" aria-label="Open port and boats">
+        <Ship size={20} className="mx-auto" />
+        <span className="hotspot-label">Investment & trade</span>
+      </button>
+      <button type="button" className="glass-card absolute right-6 top-[19%] z-10 flex items-center gap-3 rounded-2xl px-4 py-3 text-left text-white transition hover:-translate-y-1 hover:bg-white/15" onClick={() => go(6)} data-testid="button-parent-insight">
         <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ef786e]"><Eye size={17} /></span>
         <span><span className="block text-[10px] font-bold uppercase tracking-[.1em] text-white/55">Parent view</span><span className="block text-xs font-bold">See the progress</span></span>
       </button>
       <div className="absolute bottom-7 right-7 z-10 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.14em] text-white/70"><House size={13} /> Sunbeam street</div>
+      <AnimatePresence>
+        {modal && (
+          <HubModal
+            modal={modal}
+            coins={coins}
+            onClose={() => setModal(null)}
+            onDeposit={deposit}
+            onCompleteMission={completeMission}
+            onWishlist={() => setWishlisted((current) => !current)}
+            onNotify={() => setNotified((current) => !current)}
+            deposited={deposited}
+            missionComplete={missionComplete}
+            wishlisted={wishlisted}
+            notified={notified}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -290,6 +493,7 @@ function App() {
     if (next === 5) setCoins(60);
     setScene(next);
   };
+  const addCoins = (amount: number) => setCoins((current) => current + amount);
   const reset = () => {
     setCoins(50);
     setScene(1);
@@ -313,7 +517,7 @@ function App() {
          <JumpBar scene={scene} onJump={go} />
         {scene === 1 && <SceneOne go={go} />}
         {scene === 2 && <SceneTwo go={go} />}
-         {scene === 3 && <SceneThree coins={coins} go={go} />}
+         {scene === 3 && <SceneThree coins={coins} go={go} addCoins={addCoins} />}
         {scene === 4 && <SceneFour go={go} />}
          {scene === 5 && <SceneFive coins={coins} go={go} />}
         {scene === 6 && <SceneSix go={go} />}
