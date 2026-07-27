@@ -1,0 +1,47 @@
+You are a Senior Frontend Engineer. Build a high-fidelity 16:9 interactive React prototype for "FIKR" (fintech & financial literacy for kids) using image assets as scene backgrounds with interactive UI overlays.
+
+DO NOT draw custom CSS buildings or canvas graphics. Use pre-rendered background image assets and glassmorphism cards.
+
+---
+
+### 🖼️ IMAGE ASSET MAPPING & INTERACTIVE OVERLAYS:
+
+1. Scene 1 (Landing & Hook):
+   - Background: Island Overhead View Image asset.
+   - Overlay: Centered Glass Card with FIKR Logo, Tagline "Smart Money Habits for Kids", and an animated "Start Journey" button.
+
+2. Scene 2 (Younis Intro):
+   - Background: Younis's House / Bakery Isometric Asset Sheet Image.
+   - Overlay: Dialog card introducing Younis (Age 9) and his goal to save 100 coins for a bicycle.
+
+3. Scene 3 (Street Hub / Island Map):
+   - Background: Island Overhead / Street View Image (Pixar-style 3D town).
+   - Interactive Hotspots (Positioned absolute over key shops):
+     * Hotspot 1 (Bakery/Shop): Clickable badge over the green bakery shop.
+     * Hotspot 2 (Active Mission): Glowing pulsing ring over the central area triggering the Challenge.
+     * Hotspot 3 (Parent Insight): Floating glass badge in the corner.
+   - Top Stats Header: 50 Coins 🪙 | Level 2 ⚡ | "Smart Saver" Badge.
+
+4. Scene 4 (Challenge Modal / Freeze Effect):
+   - Background: Street View with backdrop blur and dark freeze overlay.
+   - Overlay Card: "Younis wants a 40-coin toy today, but his target is a 100-coin bicycle. What should he do?"
+   - Buttons: Option A (Buy Toy) vs Option B (Save & Earn 10 Bonus Coins).
+
+5. Scene 5 (Reward Feedback):
+   - Success Modal appearing over the street image with confetti, updating coin count dynamically to 60 Coins, and AI praise.
+
+6. Scene 6 (Parent Dashboard):
+   - Apple Vision Pro style dark glass floating dashboard (`backdrop-blur-xl bg-slate-900/85 border border-white/20 text-white`).
+   - Metrics: Savings Rate (85%), Decision Speed, AI Parent Insight card.
+
+7. Scene 7 (End Card):
+   - Closing pitch frame with FIKR branding and Reset button.
+
+---
+
+### 💻 TECHNICAL CONSTRAINTS:
+- Use Tailwind CSS absolute positioning (`top-[40%] left-[50%]`) for interactive hotspot buttons over background images.
+- Keep the entire app responsive within a fixed 16:9 cinematic container.
+- Include a top presentation jump-bar (Scene 1-7 buttons) for quick pitch navigation.
+
+Build this asset-driven prototype now!
