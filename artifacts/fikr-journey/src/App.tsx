@@ -14,13 +14,13 @@ const sceneMeta = [
 ];
 
 const backgrounds: Record<Scene, string> = {
-  1: '/island-overhead.jpg',
-  2: '/younis-bakery.jpg',
-  3: '/island-street.jpg',
-  4: '/island-street.jpg',
-  5: '/island-street.jpg',
-  6: '/fikr-end.jpg',
-  7: '/fikr-end.jpg',
+  1: '/official-overhead-island.jpeg',
+  2: '/official-younis-street.jpeg',
+  3: '/official-overhead-island.jpeg',
+  4: '/official-bakery-plaza.jpeg',
+  5: '/official-bakery-plaza.jpeg',
+  6: '/official-city-street.jpeg',
+  7: '/official-city-street.jpeg',
 };
 
 function Logo({ dark = false }: { dark?: boolean }) {
