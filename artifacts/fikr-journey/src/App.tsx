@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, BarChart3, Bike, Check, ChevronRight, CircleDollarSign, Clock3, Eye, Heart, House, Lightbulb, LockKeyhole, Map, RotateCcw, Sparkles, Store, Target, Trophy } from 'lucide-react';
+import younisFullBody from '@assets/ChatGPT_Image_Jul_27,_2026,_10_33_01_PM_1785182296436.png';
 
 type Scene = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
@@ -102,15 +103,18 @@ function SceneTwo({ go }: { go: (scene: Scene) => void }) {
         <motion.div
           className="younis-character"
           animate={{
-            y: [0, -10, 0],
-            rotateZ: [0, -0.7, 0.7, 0],
-            rotateY: [0, 1.5, -1.5, 0],
+            y: [0, -9, 0],
+            scale: [1, 1.012, 1],
+            rotateZ: [0, -0.55, 0.55, 0],
+            rotateY: [0, 1.8, -1.8, 0],
           }}
-          transition={{ duration: 4.8, ease: 'easeInOut', repeat: Infinity }}
-          style={{ transformPerspective: 900 }}
+          transition={{ duration: 5.2, ease: 'easeInOut', repeat: Infinity }}
+          whileHover={{ y: -14, rotateY: 5, rotateZ: -0.7, scale: 1.025 }}
+          whileTap={{ scale: 0.995 }}
+          style={{ transformPerspective: 900, transformStyle: 'preserve-3d' }}
         >
           <img
-            src="/younis-full-body.jpeg"
+            src={younisFullBody}
             alt="Younis standing and smiling"
             className="younis-image"
             data-testid="img-younis-full-body"
@@ -118,8 +122,8 @@ function SceneTwo({ go }: { go: (scene: Scene) => void }) {
         </motion.div>
         <motion.div
           className="younis-shadow"
-          animate={{ scaleX: [1, 0.88, 1], opacity: [0.42, 0.28, 0.42] }}
-          transition={{ duration: 4.8, ease: 'easeInOut', repeat: Infinity }}
+          animate={{ scaleX: [1, 0.86, 1], scaleY: [1, 0.92, 1], opacity: [0.4, 0.25, 0.4] }}
+          transition={{ duration: 5.2, ease: 'easeInOut', repeat: Infinity }}
           aria-hidden="true"
         />
       </div>

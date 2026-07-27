@@ -273,7 +273,19 @@
 }
 
 .scene-two-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
   gap: clamp(24px, 6vw, 92px);
+  justify-content: center;
+  padding-inline: clamp(28px, 5vw, 82px);
+}
+
+.scene-two-layout > .younis-stage {
+  grid-column: 1;
+}
+
+.scene-two-layout > .scene-two-card {
+  grid-column: 2;
 }
 
 .younis-stage {
@@ -281,7 +293,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  width: min(42%, 440px);
+  width: min(100%, 440px);
   height: min(82%, 650px);
   min-height: 390px;
   perspective: 900px;
@@ -302,8 +314,7 @@
   height: 100%;
   max-width: 100%;
   object-fit: contain;
-  border-radius: 22px;
-  filter: drop-shadow(0 22px 18px rgba(5, 12, 22, .32));
+  filter: drop-shadow(0 24px 20px rgba(5, 12, 22, .38));
 }
 
 .younis-shadow {
@@ -321,6 +332,7 @@
 
 .scene-two-card {
   flex: 0 1 465px;
+  width: 100%;
 }
 
 .eyebrow {
@@ -480,7 +492,16 @@
   .jump-button span:last-child { display: none; }
   .scene-content { min-height: 100dvh; padding-top: 62px; padding-bottom: 24px; }
   .dashboard-shell { height: auto; min-height: 74%; padding: 20px; }
-  .scene-two-layout { flex-direction: column; gap: 18px; justify-content: center; padding-top: 76px; }
+  .scene-two-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    justify-content: center;
+    padding-top: 76px;
+    padding-inline: 0;
+  }
+  .scene-two-layout > .younis-stage,
+  .scene-two-layout > .scene-two-card { grid-column: auto; }
   .younis-stage { width: min(72%, 300px); height: min(48dvh, 360px); min-height: 250px; }
   .scene-two-card { flex-basis: auto; width: min(92%, 465px); }
 }
