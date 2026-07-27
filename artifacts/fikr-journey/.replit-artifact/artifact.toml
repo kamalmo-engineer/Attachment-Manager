@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "FIKR Journey"
+version = "1.0.0"
+id = "artifacts/fikr-journey"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21934
+
+[services.development]
+run = "pnpm --filter @workspace/fikr-journey run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/fikr-journey", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/fikr-journey/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21934"
+BASE_PATH = "/"
